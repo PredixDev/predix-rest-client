@@ -354,7 +354,7 @@ public class RestClientImpl
         httpResponse = httpClient.execute(method);
         if ( httpResponse.getStatusLine().getStatusCode() != 200 )
         {
-            throw new RuntimeException("unable able to connect to the UAA url=" + url2 + " response=" + httpResponse);
+            throw new RuntimeException("unable to connect to the UAA url=" + url2 + " response=" + httpResponse);
         }
         HttpEntity responseEntity = httpResponse.getEntity();
         String token = EntityUtils.toString(responseEntity);
@@ -386,7 +386,7 @@ public class RestClientImpl
         HttpResponse httpResponse = httpClient.execute(method);
         if ( httpResponse.getStatusLine().getStatusCode() != 200 )
         {
-            throw new RuntimeException("unable able to connect to the UAA url=" + url + " response=" + httpResponse);  //$NON-NLS-1$//$NON-NLS-2$
+            throw new RuntimeException("unable to connect to the UAA url=" + url + " response=" + httpResponse);  //$NON-NLS-1$//$NON-NLS-2$
         }
         HttpEntity responseEntity = httpResponse.getEntity();
         String token = EntityUtils.toString(responseEntity);
