@@ -4,8 +4,8 @@
 <a href="http://predixdev.github.io/predix-rest-client" target="_blank">
 	<img height="50px" width="100px" src="images/pages.jpg" alt="view github pages">
 </a>
-Predix Rest Client
-==============
+
+### Predix Rest Client
 
 
 
@@ -52,7 +52,7 @@ The predix-rest-client project provides standard GET, PUT, POST, DELETE with hel
     note: mvn clean install may run integration tests against services you may not have set up yet
   ```
   
-##Dependencies
+## Dependencies
 |Required - latest unless specified | Note |
 | ------------- | :----- |
 | Java 8 | |
