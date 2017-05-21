@@ -9,6 +9,7 @@
 
 
 
+
 Welcome to Predix Rest Client, a [Microcomponent](https://github.com/PredixDev/predix-rmd-ref-app/blob/master/docs/microcomponents.md) Utility.
 
 The predix-rest-client project provides standard GET, PUT, POST, DELETE with helpers to manage Predix OAuth Security in the cloud.  See the property files and [IOauthRestConfig.java](https://github.com/PredixDev/predix-boot/blob/master/predix-rest-client/src/main/java/com/ge/predix/solsvc/restclient/config/IOauthRestConfig.java) which allow a microservice to connect to Predix UAA (User Authentication and Authorization) servers in the cloud. All the reference app microservices use this utility to make Rest calls in the cloud.
