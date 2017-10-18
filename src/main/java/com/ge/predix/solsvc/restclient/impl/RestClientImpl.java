@@ -310,6 +310,8 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 			}
 			HttpEntity responseEntity = httpResponse.getEntity();
 			token = EntityUtils.toString(responseEntity);
+			if ( token.contains("<html")) 
+				throw new RuntimeException("unable able to connect to the url=" + url2 + " A common mistake is to use the UAA uri, but instead you should use the UAA IssuerId, response=" + token);
 		}
 		return token;
 

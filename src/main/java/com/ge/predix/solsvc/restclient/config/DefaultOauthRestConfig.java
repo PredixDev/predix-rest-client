@@ -22,9 +22,17 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
     @Value("${predix.oauth.uri:#{null}}")
     private String oauthUri;
     
-	
-    @Value("${predix.oauth.systemEnvOverrideProxy:true}")
-    private boolean oauthSystemEnvOverrideProxy;
+	//get from property file, then system -D props, then environment vars, in that order
+    @Value("${predix.oauth.useProxyPropertiesFromFile:true}")
+    private boolean oauthUseProxyPropertiesFromFile;
+    @Value("${predix.oauth.useProxyPropertiesFromSystem:true}")
+    private boolean oauthUseProxyPropertiesFromSystem;
+    @Value("${predix.oauth.useProxyPropertiesFromEnvironment:true}")
+    private boolean oauthUseProxyPropertiesFromEnvironment;
+
+    //some libraries might be looking for them, so set them if true
+    @Value("${predix.oauth.applyProxyPropertiesToSystemProperties:true}")
+    private boolean oauthApplyProxyPropertiesToSystemProperties;
 
     //see setter
     private String oauthProxyHost;
@@ -51,7 +59,7 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 	@Value("${predix.oauth.encodePassword:false}")
 	private boolean oauthEncodeUserPassword;
 	
-	@Value("${predix.oauth.certLocation:file:./certs/authTruststore.jks}")
+	@Value("${predix.oauth.certLocation:#{null}}")
 	private String oauthCertLocation;
 	@Value("${predix.oauth.certPassword:#{null}}")
 	private String oauthCertPassword;
@@ -174,12 +182,36 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
     @SuppressWarnings("nls")
 	@Value("${predix.oauth.proxyHost:#{null}}")
 	public void setOauthProxyHost(String oauthProxyHost) {
-		if ( this.oauthSystemEnvOverrideProxy && oauthProxyHost != null ) {
-			//same as setting -Dhttps.proxyHost=myproxyserver.company.com
-	        System.setProperty("https.proxyHost",oauthProxyHost);
-	        System.setProperty("http.proxyHost",oauthProxyHost);
+    	log.debug("http_proxy=" + System.getenv("https_proxy"));
+		log.debug("https.proxyHost=" + System.getProperty("https.proxyHost"));
+		
+		String httpProxyHostSystemProperty = System.getProperty("http.proxyHost");
+		String httpsProxyHostSystemProperty = System.getProperty("https.proxyHost");
+		String httpsProxyEnvVar = System.getenv("https_proxy");
+		
+		if (this.oauthUseProxyPropertiesFromFile && oauthProxyHost != null) {
+			this.oauthProxyHost = oauthProxyHost;
+		} else if (this.oauthUseProxyPropertiesFromSystem && httpsProxyHostSystemProperty != null) {
+			this.oauthProxyHost = httpsProxyHostSystemProperty;
+		} else if (this.oauthUseProxyPropertiesFromSystem && httpProxyHostSystemProperty != null) {
+			this.oauthProxyHost = httpProxyHostSystemProperty;
+		} else if (this.oauthUseProxyPropertiesFromEnvironment && httpsProxyEnvVar != null) {
+			String httpsProxyHostPropHost = httpsProxyEnvVar.substring(httpsProxyEnvVar.indexOf("://") + 3);
+			httpsProxyHostPropHost = httpsProxyHostPropHost.substring(0, httpsProxyHostPropHost.indexOf(":"));
+			this.oauthProxyHost = httpsProxyHostPropHost;
 		}
-		this.oauthProxyHost = oauthProxyHost;
+		else
+			log.info("proxy host not set because the flags all state to ignore setting the proxy host or you did not provide the values in a property-file, as -D system properties, or set as an Environment Variable ");
+		
+		log.debug("oauthProxyHost=" + this.oauthProxyHost);
+		
+		if (this.oauthApplyProxyPropertiesToSystemProperties) {
+			// same as setting -Dhttps.proxyHost=myproxyserver.company.com
+			if ( this.oauthProxyHost != null ) {
+				System.setProperty("https.proxyHost", this.oauthProxyHost);
+				System.setProperty("http.proxyPort", this.oauthProxyHost);
+			}
+		}
 	}
 
 	/**
@@ -198,13 +230,38 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
     @SuppressWarnings("nls")
 	@Value("${predix.oauth.proxyPort:#{null}}")
 	public void setOauthProxyPort(String oauthProxyPort) {
-		if ( this.oauthSystemEnvOverrideProxy && oauthProxyPort != null ) {
-			//same as setting -Dhttps.proxyHost=myproxyserver.company.com
-	        System.setProperty("https.proxyPort",oauthProxyPort);
-	        System.setProperty("http.proxyPort",oauthProxyPort);
-		}
+		log.debug("http_proxy=" + System.getenv("https_proxy"));
+		log.debug("https.proxyPort=" + System.getProperty("https.proxyPort"));
 
-		this.oauthProxyPort = oauthProxyPort;
+		String httpProxyPortSystemProperty = System.getProperty("http.proxyPort");
+		String httpsProxyPortSystemProperty = System.getProperty("https.proxyPort");
+		String httpsProxyEnvVar = System.getenv("https_proxy");
+		
+		if (this.oauthUseProxyPropertiesFromFile && oauthProxyPort != null) {
+			this.oauthProxyPort = oauthProxyPort;
+		} else if (this.oauthUseProxyPropertiesFromSystem && httpsProxyPortSystemProperty != null) {
+			this.oauthProxyPort = httpsProxyPortSystemProperty;
+		} else if (this.oauthUseProxyPropertiesFromSystem && httpProxyPortSystemProperty != null) {
+			this.oauthProxyPort = httpProxyPortSystemProperty;
+		} else if (this.oauthUseProxyPropertiesFromEnvironment && httpsProxyEnvVar != null) {
+			String httpsProxyPropPort = httpsProxyEnvVar.substring(httpsProxyEnvVar.indexOf("://") + 3);
+			httpsProxyPropPort=httpsProxyPropPort.substring(httpsProxyPropPort.indexOf(":")+1);
+			if ( httpsProxyPropPort.endsWith("/"))
+				httpsProxyPropPort=httpsProxyPropPort.substring(0,httpsProxyPropPort.indexOf("/"));
+			this.oauthProxyPort = httpsProxyPropPort;
+		}
+		else
+			log.info("proxy port not set because the flags all state to ignore setting the proxy port");
+		
+		log.debug("oauthProxyPort=" + this.oauthProxyPort);
+		
+		if (this.oauthApplyProxyPropertiesToSystemProperties) {
+			// same as setting -Dhttps.proxyPort=8080
+			if ( this.oauthProxyPort != null ) {
+				System.setProperty("https.proxyPort", this.oauthProxyPort);
+				System.setProperty("http.proxyPort", this.oauthProxyPort);
+			}
+		}
 	}
 
 	/**
