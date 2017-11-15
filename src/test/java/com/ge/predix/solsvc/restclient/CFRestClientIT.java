@@ -98,7 +98,7 @@ public class CFRestClientIT
             throws IOException
     {
         String baseUri = getBaseUri();
-        String url = baseUri + "/asset/compressor-2015";
+        String url = baseUri + "/asset/compressor-2017";
         log.info("Get Asset " + url);
 
         List<Header> headers = this.restClient.getSecureTokenForClientId();

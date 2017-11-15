@@ -110,7 +110,7 @@ public class CFRestMultipleClientIT
             throws IOException
     {
         String baseUri = getBaseUri();
-        String url = baseUri + "/asset/compressor-2015";
+        String url = baseUri + "/asset/compressor-2017";
         log.info("Get Asset " + url);
 
         List<Header> headers = this.restClient.getSecureTokenForClientId();
@@ -131,7 +131,7 @@ public class CFRestMultipleClientIT
             throws IOException
     {
         String baseUri = getBaseUri();
-        String url = baseUri + "/asset/compressor-2015";
+        String url = baseUri + "/asset/compressor-2017";
         log.info("Get Asset " + url);
 
         List<Header> headers = this.restClient2.getSecureTokenForClientId();
