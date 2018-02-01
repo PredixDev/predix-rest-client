@@ -34,14 +34,14 @@ public class TestOauthRestConfig2 extends DefaultOauthRestConfig
 	}
     
 	@Override
-	@Value("${predix.oauth.proxyHost2:#{null}}")
-	public void setOauthProxyHost(String oauthProxyHost) {
-		super.setOauthProxyHost(oauthProxyHost);
+	@Value("${predix.rest.proxyHost2:#{null}}")
+	public void setProxyHost(String proxyHost) {
+		super.setProxyHost(proxyHost);
 	}
 
 	@Override
-	@Value("${predix.oauth.proxyPort2:#{null}}")
-	public void setOauthProxyPort(String oauthProxyPort) {
-		super.setOauthProxyPort(oauthProxyPort);
+	@Value("${predix.rest.proxyPort2:#{null}}")
+	public void setProxyPort(String proxyPort) {
+		super.setProxyPort(proxyPort);
 	}
 }

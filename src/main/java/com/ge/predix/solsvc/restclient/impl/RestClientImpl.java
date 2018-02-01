@@ -26,7 +26,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.ParseException;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -36,6 +39,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -129,19 +133,19 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 	 *            the proxy host
 	 * @param proxyPort
 	 *            the proxy port
-	 * @param string 
+	 * @param string
 	 * @return the http client
 	 */
 	@SuppressWarnings("nls")
 	private CloseableHttpClient getHttpClient(int connectionTimeout, int socketTimeout, String url, String proxyHost,
-			String proxyPort, String nonProxyHost) {
+			String proxyPort, String nonProxyHost, String proxyUser, String proxyPassword) {
 
 		String localProxyHost = proxyHost;
 		Builder requestBuilder = RequestConfig.custom();
 		if (this.restConfig.getPoolConnectionRequestTimeout() > 0) {
-			//timeout to request from connection manager
+			// timeout to request from connection manager
 			requestBuilder = requestBuilder
-					.setConnectionRequestTimeout(this.restConfig.getPoolConnectionRequestTimeout()); 
+					.setConnectionRequestTimeout(this.restConfig.getPoolConnectionRequestTimeout());
 		}
 		if (connectionTimeout > 0) {
 			// timeout till connection with server is established
@@ -158,7 +162,7 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 		if (nonProxyHost != null) {
 			try {
 				URL theUrl = new URL(url);
-				StringTokenizer tokenizer = new StringTokenizer(nonProxyHost,",");
+				StringTokenizer tokenizer = new StringTokenizer(nonProxyHost, ",");
 				while (tokenizer.hasMoreTokens()) {
 					String host = tokenizer.nextToken();
 					if (host.trim().equals(theUrl.getHost()))
@@ -170,6 +174,12 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 		}
 
 		if (localProxyHost != null && !localProxyHost.equals("")) { //$NON-NLS-1$
+			if (proxyUser != null && !proxyPassword.equals("")) { //$NON-NLS-1$
+				CredentialsProvider credsProvider = new BasicCredentialsProvider();
+				credsProvider.setCredentials(new AuthScope(localProxyHost, Integer.valueOf(proxyPort)),
+						new UsernamePasswordCredentials(proxyUser, proxyPassword));
+				builder.setDefaultCredentialsProvider(credsProvider);
+			}
 			HttpHost proxy = new HttpHost(localProxyHost, Integer.valueOf(proxyPort));
 			DefaultProxyRoutePlanner routePlanner = new DefaultProxyRoutePlanner(proxy);
 			builder = builder.setRoutePlanner(routePlanner);
@@ -234,11 +244,10 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 
 		String url = oauthRestConfig.getOauthIssuerId();
 
-
 		try (CloseableHttpClient httpClient = getHttpClient(oauthRestConfig.getOauthConnectionTimeout(),
-				oauthRestConfig.getOauthSocketTimeout(), url,  oauthRestConfig.getOauthProxyHost(),
-				oauthRestConfig.getOauthProxyPort(), oauthRestConfig.getOauthNoProxyHost());) {
-			
+				oauthRestConfig.getOauthSocketTimeout(), url, oauthRestConfig.getProxyHost(),
+				oauthRestConfig.getProxyPort(), oauthRestConfig.getNoProxyHost(), oauthRestConfig.getProxyUser(), oauthRestConfig.getProxyPassword());) {
+
 			String queryParams = null;
 			if (oauthRestConfig.getOauthUserName() == null) {
 				queryParams = "grant_type=" + oauthRestConfig.getOauthGrantType();
@@ -262,7 +271,6 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 			// httpClient = httpClientBuilder.build();
 			// HttpEntity<String> requestEntity = new HttpEntity<>(requestBody,
 			// headers);
-
 
 			// String token = performPost(url, httpClient, requestBody,
 			// headers2);
@@ -310,8 +318,10 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 			}
 			HttpEntity responseEntity = httpResponse.getEntity();
 			token = EntityUtils.toString(responseEntity);
-			if ( token.contains("<html")) 
-				throw new RuntimeException("unable able to connect to the url=" + url2 + " A common mistake is to use the UAA uri, but instead you should use the UAA IssuerId, response=" + token);
+			if (token.contains("<html"))
+				throw new RuntimeException("unable able to connect to the url=" + url2
+						+ " A common mistake is to use the UAA uri, but instead you should use the UAA IssuerId, response="
+						+ token);
 		}
 		return token;
 
@@ -461,14 +471,15 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 	public CloseableHttpResponse get(String url, List<Header> headers, int connectionTimeout, int socketTimeout) {
 
 		try (CloseableHttpClient httpClient = getHttpClient(connectionTimeout, socketTimeout, url,
-				this.restConfig.getOauthProxyHost(), this.restConfig.getOauthProxyPort(), this.restConfig.getOauthNoProxyHost());) {
+				this.restConfig.getProxyHost(), this.restConfig.getProxyPort(),
+				this.restConfig.getNoProxyHost(), this.restConfig.getProxyUser(), "proxypass");) {
 			if (log.isTraceEnabled()) {
 				log.trace("url=" + url);
 				log.trace("headers=" + headers);
 				log.trace("connectionTimeout=" + connectionTimeout);
 				log.trace("socketTimeout=" + socketTimeout);
-				log.trace("proxyHost=" + this.restConfig.getOauthProxyHost());
-				log.trace("proxyPort=" + this.restConfig.getOauthProxyPort());
+				log.trace("proxyHost=" + this.restConfig.getProxyHost());
+				log.trace("proxyPort=" + this.restConfig.getProxyPort());
 			}
 			HttpGet method = new HttpGet(url);
 			method.setHeaders(headers.toArray(new Header[headers.size()]));
@@ -501,8 +512,9 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 			org.apache.http.HttpEntity entity = new StringEntity(request);
 			method.setEntity(entity);
 			method.setHeaders(headers.toArray(new Header[headers.size()]));
-			try (CloseableHttpClient httpClient = getHttpClient ( connectionTimeout, socketTimeout, url,
-					this.restConfig.getOauthProxyHost(), this.restConfig.getOauthProxyPort(), this.restConfig.getOauthNoProxyHost());) {
+			try (CloseableHttpClient httpClient = getHttpClient(connectionTimeout, socketTimeout, url,
+					this.restConfig.getProxyHost(), this.restConfig.getProxyPort(),
+					this.restConfig.getNoProxyHost(), this.restConfig.getProxyUser(), this.restConfig.getProxyPassword());) {
 				CloseableHttpResponse httpResponse = httpClient.execute(method);
 				return httpResponse;
 			} catch (Exception e) {
@@ -527,8 +539,9 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 	public CloseableHttpResponse post(String url, HttpEntity entity, List<Header> headers, int connectionTimeout,
 			int socketTimeout) {
 
-		try (CloseableHttpClient httpClient = getHttpClient(connectionTimeout, socketTimeout, url, 
-				this.restConfig.getOauthProxyHost(), this.restConfig.getOauthProxyPort(), this.restConfig.getOauthNoProxyHost());) {
+		try (CloseableHttpClient httpClient = getHttpClient(connectionTimeout, socketTimeout, url,
+				this.restConfig.getProxyHost(), this.restConfig.getProxyPort(),
+				this.restConfig.getNoProxyHost(), this.restConfig.getProxyUser(), this.restConfig.getProxyPassword());) {
 			HttpPost method = new HttpPost(url);
 			method.setEntity(entity);
 			if (headers != null) {
@@ -560,8 +573,9 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 	public CloseableHttpResponse put(String url, String request, List<Header> headers, int connectionTimeout,
 			int socketTimeout) {
 
-		try (CloseableHttpClient httpClient = getHttpClient(connectionTimeout, socketTimeout, url, 
-				this.restConfig.getOauthProxyHost(), this.restConfig.getOauthProxyPort(),this.restConfig.getOauthNoProxyHost());) {
+		try (CloseableHttpClient httpClient = getHttpClient(connectionTimeout, socketTimeout, url,
+				this.restConfig.getProxyHost(), this.restConfig.getProxyPort(),
+				this.restConfig.getNoProxyHost(), this.restConfig.getProxyUser(), this.restConfig.getProxyPassword());) {
 			HttpPut method = new HttpPut(url);
 			org.apache.http.HttpEntity entity = new StringEntity(request);
 			method.setEntity(entity);
@@ -583,8 +597,9 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 	@SuppressWarnings({ "nls" })
 	@Override
 	public CloseableHttpResponse delete(String url, List<Header> headers, int connectionTimeout, int socketTimeout) {
-		try (CloseableHttpClient httpClient = getHttpClient(connectionTimeout, socketTimeout, url, 
-				this.restConfig.getOauthProxyHost(), this.restConfig.getOauthProxyPort(), this.restConfig.getOauthNoProxyHost());) {
+		try (CloseableHttpClient httpClient = getHttpClient(connectionTimeout, socketTimeout, url,
+				this.restConfig.getProxyHost(), this.restConfig.getProxyPort(),
+				this.restConfig.getNoProxyHost(), this.restConfig.getProxyUser(), this.restConfig.getProxyPassword());) {
 			HttpDelete method = new HttpDelete(url);
 			method.setHeaders(headers.toArray(new Header[headers.size()]));
 
@@ -683,12 +698,15 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 		return this.restConfig;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.ge.predix.solsvc.restclient.impl.RestClient#appendHeaders(java.util.List, java.lang.String, java.lang.String)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.ge.predix.solsvc.restclient.impl.RestClient#appendHeaders(java.util.
+	 * List, java.lang.String, java.lang.String)
 	 */
 	@Override
-	public List<Header> appendHeaders(List<Header> headers, String headerName,
-			String headerValue) {
+	public List<Header> appendHeaders(List<Header> headers, String headerName, String headerValue) {
 		// TODO Auto-generated method stub
 		return null;
 	}

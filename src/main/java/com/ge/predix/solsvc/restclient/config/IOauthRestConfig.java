@@ -13,6 +13,41 @@ public interface IOauthRestConfig
     public String printName();
     
     /**
+	 * The hostname of the corporate internet proxy server that monitors traffic from your corporate network to the internet
+	 * 
+	 * @return String
+	 */
+	public String getProxyHost();
+
+	/**
+	 * The port of the corporate internet proxy server that monitors traffic from your corporate network to the internet
+	 * 
+	 * @return String
+	 */
+	public String getProxyPort();
+
+	/**
+	 * The user, if necessary, of the corporate internet proxy server that monitors traffic from your corporate network to the internet
+	 * 
+	 * @return String
+	 */
+	public String getProxyUser();
+
+	/**
+	 * The port of the corporate internet proxy server that monitors traffic from your corporate network to the internet
+	 * 
+	 * @return String
+	 */
+	public String getProxyPassword();
+
+	/**
+	 * The hostnames to not go through the proxy server that monitors traffic from your corporate network to the internet
+	 * 
+	 * @return String
+	 */
+	public String getNoProxyHost();
+
+	/**
      * @return -
      */
     public String getOauthIssuerId();
@@ -51,27 +86,6 @@ public interface IOauthRestConfig
      * @return String
      */
     public boolean getOauthClientIdEncode();
-
-    /**
-     * The hostname of the corporate internet proxy server that monitors traffic from your corporate network to the internet
-     * 
-     * @return String
-     */
-    public String getOauthProxyHost();
-
-    /**
-     * The hostname of the corporate internet proxy server that monitors traffic from your corporate network to the internet
-     * 
-     * @return String
-     */
-    public String getOauthProxyPort();
-    
-    /**
-     * The hostnames to not go through the proxy server that monitors traffic from your corporate network to the internet
-     * 
-     * @return String
-     */
-    public String getOauthNoProxyHost();
 
     /**
      * The type of token returned from the UAA or OAuth server, e.g. JWT
