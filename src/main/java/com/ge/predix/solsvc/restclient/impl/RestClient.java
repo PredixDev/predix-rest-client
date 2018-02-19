@@ -24,8 +24,6 @@ public interface RestClient
     /**
      * @param url -
      * @param headers -
-     * @param connectionTimeout -
-     * @param socketTimeout -
      * @return -
      */
     public abstract CloseableHttpResponse get(String url, List<Header> headers);
@@ -115,7 +113,8 @@ public interface RestClient
 
     /**
      * @param headers -
-     * @param value -
+     * @param headerName -
+     * @param headerValue -
      * @return -
      */
     List<Header> appendHeaders(List<Header> headers, String headerName, String headerValue);
@@ -151,7 +150,16 @@ public interface RestClient
      */
     public IOauthRestConfig getRestConfig();
 
+    /**
+	 * @param oauthClientId -
+	 * @return -
+	 */
+	public List<Header> getOauthHttpHeaders(String oauthClientId);
 
-
+	/**
+	 * @param oauthClientId -
+	 * @return -
+	 */
+	public String requestToken(String oauthClientId);
 
 }

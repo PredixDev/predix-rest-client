@@ -24,12 +24,12 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 
 	// get from property file, then system -D props, then environment vars, in
 	// that order
-	@Value("${predix.oauth.useProxyPropertiesFromFile:true}")
-	private boolean oauthUseProxyPropertiesFromFile;
-	@Value("${predix.oauth.useProxyPropertiesFromSystem:true}")
-	private boolean oauthUseProxyPropertiesFromSystem;
-	@Value("${predix.oauth.useProxyPropertiesFromEnvironment:true}")
-	private boolean oauthUseProxyPropertiesFromEnvironment;
+	@Value("${predix.rest.useProxyPropertiesFromFile:true}")
+	private boolean useProxyPropertiesFromFile;
+	@Value("${predix.rest.useProxyPropertiesFromSystem:true}")
+	private boolean useProxyPropertiesFromSystem;
+	@Value("${predix.rest.useProxyPropertiesFromEnvironment:true}")
+	private boolean useProxyPropertiesFromEnvironment;
 
 	// some libraries might be looking for them, so set them if true
 	@Value("${predix.oauth.applyProxyPropertiesToSystemProperties:true}")
@@ -190,18 +190,21 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 	public void setProxyHost(String proxyHost) {
 		log.debug("http_proxy=" + System.getenv("https_proxy"));
 		log.debug("https.proxyHost=" + System.getProperty("https.proxyHost"));
+		log.debug("useProxyPropertiesFromEnvironment=" + this.useProxyPropertiesFromEnvironment);
+		log.debug("useProxyPropertiesFromFile=" + this.useProxyPropertiesFromFile);
+		log.debug("useProxyPropertiesFromSystem=" + this.useProxyPropertiesFromSystem);
 
 		String httpProxyHostSystemProperty = System.getProperty("http.proxyHost");
 		String httpsProxyHostSystemProperty = System.getProperty("https.proxyHost");
 		String httpsProxyEnvVar = System.getenv("https_proxy");
 
-		if (this.oauthUseProxyPropertiesFromFile && proxyHost != null) {
+		if (this.useProxyPropertiesFromFile && proxyHost != null) {
 			this.proxyHost = proxyHost;
-		} else if (this.oauthUseProxyPropertiesFromSystem && httpsProxyHostSystemProperty != null) {
+		} else if (this.useProxyPropertiesFromSystem && httpsProxyHostSystemProperty != null) {
 			this.proxyHost = httpsProxyHostSystemProperty;
-		} else if (this.oauthUseProxyPropertiesFromSystem && httpProxyHostSystemProperty != null) {
+		} else if (this.useProxyPropertiesFromSystem && httpProxyHostSystemProperty != null) {
 			this.proxyHost = httpProxyHostSystemProperty;
-		} else if (this.oauthUseProxyPropertiesFromEnvironment && httpsProxyEnvVar != null) {
+		} else if (this.useProxyPropertiesFromEnvironment && httpsProxyEnvVar != null) {
 			String httpsProxyHostPropHost = httpsProxyEnvVar.substring(httpsProxyEnvVar.indexOf("://") + 3);
 			httpsProxyHostPropHost = httpsProxyHostPropHost.substring(0, httpsProxyHostPropHost.indexOf(":"));
 			this.proxyHost = httpsProxyHostPropHost;
@@ -242,13 +245,13 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 		String httpsProxyPortSystemProperty = System.getProperty("https.proxyPort");
 		String httpsProxyEnvVar = System.getenv("https_proxy");
 
-		if (this.oauthUseProxyPropertiesFromFile && proxyPort != null) {
+		if (this.useProxyPropertiesFromFile && proxyPort != null) {
 			this.proxyPort = proxyPort;
-		} else if (this.oauthUseProxyPropertiesFromSystem && httpsProxyPortSystemProperty != null) {
+		} else if (this.useProxyPropertiesFromSystem && httpsProxyPortSystemProperty != null) {
 			this.proxyPort = httpsProxyPortSystemProperty;
-		} else if (this.oauthUseProxyPropertiesFromSystem && httpProxyPortSystemProperty != null) {
+		} else if (this.useProxyPropertiesFromSystem && httpProxyPortSystemProperty != null) {
 			this.proxyPort = httpProxyPortSystemProperty;
-		} else if (this.oauthUseProxyPropertiesFromEnvironment && httpsProxyEnvVar != null) {
+		} else if (this.useProxyPropertiesFromEnvironment && httpsProxyEnvVar != null) {
 			String httpsProxyPropPort = httpsProxyEnvVar.substring(httpsProxyEnvVar.indexOf("://") + 3);
 			httpsProxyPropPort = httpsProxyPropPort.substring(httpsProxyPropPort.indexOf(":") + 1);
 			if (httpsProxyPropPort.endsWith("/"))
@@ -287,7 +290,6 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 			return this.proxyUser.trim();
 		return this.proxyUser;
 	}
-
 
 	/**
 	 * @return the proxyPassword
@@ -435,12 +437,12 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 	@Override
 	public String toString() {
 		return "DefaultOauthRestConfig [oauthIssuerId=" + this.oauthIssuerId + ", oauthUri=" + this.oauthUri
-				+ ", proxyHost=" + this.proxyHost + ", proxyPort=" + this.proxyPort
-				+ ", oauthGrantType=" + this.oauthGrantType + ", oauthTokenType=" + this.oauthTokenType
-				+ ", oauthClientId=" + this.oauthClientId + ", oauthClientIdEncode=" + this.oauthClientIdEncode
-				+ ", oauthUserName=" + this.oauthUserName + ", oauthUserPassword=" + this.oauthUserPassword
-				+ ", oauthEncodeUserPassword=" + this.oauthEncodeUserPassword + ", oauthCertLocation="
-				+ this.oauthCertLocation + ", oauthCertPassword=" + this.oauthCertPassword + ", oauthConnectionTimeout="
+				+ ", proxyHost=" + this.proxyHost + ", proxyPort=" + this.proxyPort + ", oauthGrantType="
+				+ this.oauthGrantType + ", oauthTokenType=" + this.oauthTokenType + ", oauthClientId="
+				+ this.oauthClientId + ", oauthClientIdEncode=" + this.oauthClientIdEncode + ", oauthUserName="
+				+ this.oauthUserName + ", oauthUserPassword=" + this.oauthUserPassword + ", oauthEncodeUserPassword="
+				+ this.oauthEncodeUserPassword + ", oauthCertLocation=" + this.oauthCertLocation
+				+ ", oauthCertPassword=" + this.oauthCertPassword + ", oauthConnectionTimeout="
 				+ this.oauthConnectionTimeout + ", oauthSocketTimeout=" + this.oauthSocketTimeout + ", poolMaxSize="
 				+ this.poolMaxSize + ", poolValidateAfterInactivityTime=" + this.poolValidateAfterInactivityTime
 				+ ", poolConnectionRequestTimeout=" + this.poolConnectionRequestTimeout + ", defaultConnectionTimeout="

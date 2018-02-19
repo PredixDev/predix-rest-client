@@ -711,4 +711,69 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.ge.predix.solsvc.restclient.impl.RestClient#getOauthHttpHeaders(java.lang.String)
+	 */
+	@SuppressWarnings("nls")
+	@Override
+	public List<Header> getOauthHttpHeaders(String oauthClientId) {
+		byte[] encodedAuth = oauthClientId.getBytes();
+		if (this.restConfig.getOauthClientIdEncode())
+			encodedAuth = Base64.encodeBase64(oauthClientId.getBytes());
+		String authHeader = "Basic " + new String(encodedAuth);
+		List<Header> headers = new ArrayList<Header>();
+		headers.add(new BasicHeader("Content-Type", "application/x-www-form-urlencoded"));
+		headers.add(new BasicHeader("Authorization", authHeader));
+		headers.add(new BasicHeader("Pragma", "no-cache"));
+		// String[] realmArray = auth.split(":");
+		// headers.add(new BasicHeader("x-tenant", realmArray[0]));
+		return headers;
+	}
+	
+	/**
+	 * Get Token for a client/user
+	 * @param oauthClientId -
+	 * @return -
+	 */
+	@SuppressWarnings("nls")
+	@Override
+	public String requestToken(String oauthClientId) {
+		List<Header> getTokenHeaders = getOauthHttpHeaders(oauthClientId);
+		log.trace("requestToken headers=" + getTokenHeaders);
+
+		String url = this.restConfig.getOauthIssuerId();
+
+		try (CloseableHttpClient httpClient = getHttpClient(this.restConfig.getOauthConnectionTimeout(),
+				this.restConfig.getOauthSocketTimeout(), url, this.restConfig.getProxyHost(),
+				this.restConfig.getProxyPort(), this.restConfig.getNoProxyHost(),
+				this.restConfig.getProxyUser(),this.restConfig.getProxyPassword())) {
+
+			String queryParams = null;
+			if (this.restConfig.getOauthUserName() == null) {
+				queryParams = "grant_type=" + this.restConfig.getOauthGrantType();
+			} else {
+				queryParams = "grant_type=" + this.restConfig.getOauthGrantType() + "&username="
+						+ this.restConfig.getOauthUserName() + "&password=";
+
+				if (!this.restConfig.isOauthEncodeUserPassword())
+					queryParams += this.restConfig.getOauthUserPassword();
+				else
+					queryParams += new String(Base64.encodeBase64(this.restConfig.getOauthUserPassword().getBytes()));
+			}
+
+			log.trace("tokenUrl=" + url + " queryParams=" + queryParams); //$NON-NLS-1$ //$NON-NLS-2$
+			String tokenResponse = performGet(url, httpClient, queryParams, getTokenHeaders);
+			Token token = new Token(this.restConfig.getOauthTokenType());
+			token.update(tokenResponse);
+			log.debug("token=" + token); //$NON-NLS-1$
+
+			return token.getToken();
+		} catch (ClientProtocolException e) {
+			throw new RuntimeException("unable to call url=" + url, e);
+		} catch (IOException e) {
+			throw new RuntimeException("unable to call url=" + url, e);
+		} finally {
+			printPoolStats();
+		}
+	}
 }
