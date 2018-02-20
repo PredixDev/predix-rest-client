@@ -14,6 +14,8 @@
 			<list>
 				<value>classpath:application-default.properties</value>
 				<value>classpath:application.properties</value>
+				<value>classpath:application-dsp.properties</value>
+				<value>file:${karaf.home}/predix/application-dsp.properties</value>
 			</list>
 		</property>
 		<property name="ignoreUnresolvablePlaceholders" value="true" />
