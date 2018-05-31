@@ -114,7 +114,7 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 	 * set up the http connection pool
 	 */
 	@PostConstruct
-	private void init() {
+	public void init() {
 		setupSecureContext(this.restConfig.getOauthCertLocation(), this.restConfig.getOauthCertPassword());
 		this.poolManager = new PoolingHttpClientConnectionManager();
 		if (this.poolManager != null) {
