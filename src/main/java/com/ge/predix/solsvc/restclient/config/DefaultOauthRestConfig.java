@@ -17,10 +17,12 @@ import org.springframework.stereotype.Component;
 public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAware {
 	private static Logger log = LoggerFactory.getLogger(DefaultOauthRestConfig.class);
 
-	@Value("${predix.oauth.issuerId.url:#{null}}")
-	private String oauthIssuerId;
-	@Value("${predix.oauth.uri:#{null}}")
-	private String oauthUri;
+	/**
+	 * -
+	 */
+	public DefaultOauthRestConfig() {
+		super();
+	}
 
 	// get from property file, then system -D props, then environment vars, in
 	// that order
@@ -35,6 +37,7 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 	@Value("${predix.oauth.applyProxyPropertiesToSystemProperties:true}")
 	private boolean oauthApplyProxyPropertiesToSystemProperties;
 
+	// proxy props
 	// see setter
 	private String proxyHost;
 	// set setter
@@ -49,6 +52,14 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 	@Value("${predix.rest.noproxy:localhost,127.0.0.1}")
 	private String noProxyHost;
 
+	// UAA
+	@Value("${predix.oauth.issuerId.url:#{null}}")
+	private String oauthIssuerId;
+
+	@Value("${predix.oauth.uri:#{null}}")
+	private String oauthUri; // not used but retrieved from VCAP in case it's
+								// needed later
+
 	@Value("${predix.oauth.grantType:client_credentials}")
 	private String oauthGrantType;
 	@Value("${predix.oauth.tokenType:JWT}")
@@ -62,13 +73,16 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 	private String oauthUserName;
 	@Value("${predix.oauth.userPassword:#{null}}")
 	private String oauthUserPassword;
-	@Value("${predix.oauth.encodePassword:false}")
+	@Value("${predix.oauth.encodePassword:true}")
 	private boolean oauthEncodeUserPassword;
 
+	// Java certs for secure TLS
 	@Value("${predix.oauth.certLocation:#{null}}")
 	private String oauthCertLocation;
 	@Value("${predix.oauth.certPassword:#{null}}")
 	private String oauthCertPassword;
+
+	// HTTP Client props
 	@Value("${predix.oauth.connectionTimeout:10000}")
 	private int oauthConnectionTimeout; // timeout till connection with server
 										// is established
@@ -95,85 +109,6 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 	public static final String UAA_VCAPS_NAME = "predix_uaa_name"; //$NON-NLS-1$
 
 	/**
-	 * -
-	 */
-	public DefaultOauthRestConfig() {
-		super();
-	}
-
-	/**
-	 * @return -
-	 */
-	@Override
-	public String getOauthIssuerId() {
-		return this.oauthIssuerId;
-	}
-
-	/**
-	 * you may override the setter with an @value annotated property
-	 * 
-	 * @param oauthIssuerId
-	 *            -
-	 */
-	public void setOauthIssuerId(String oauthIssuerId) {
-
-		this.oauthIssuerId = oauthIssuerId;
-	}
-
-	/**
-	 * @return -
-	 */
-	@Override
-	public String getOauthGrantType() {
-		return this.oauthGrantType;
-	}
-
-	/**
-	 * @return -
-	 */
-	@Override
-	public String getOauthCertLocation() {
-		return this.oauthCertLocation;
-	}
-
-	/**
-	 * @return -
-	 */
-	@Override
-	public String getOauthCertPassword() {
-		return this.oauthCertPassword;
-	}
-
-	/**
-	 * @return -
-	 */
-	@Override
-	public String getOauthClientId() {
-		if (this.oauthClientId != null)
-			return this.oauthClientId.trim();
-		return this.oauthClientId;
-	}
-
-	/**
-	 * you may override the setter with an @value annotated property
-	 * 
-	 * @param oauthClientId
-	 *            -
-	 */
-	public void setOauthClientId(String oauthClientId) {
-		this.oauthClientId = oauthClientId;
-
-	}
-
-	/**
-	 * @return -
-	 */
-	@Override
-	public boolean getOauthClientIdEncode() {
-		return this.oauthClientIdEncode;
-	}
-
-	/**
 	 * @return -
 	 */
 	@Override
@@ -193,11 +128,11 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 		log.debug("useProxyPropertiesFromEnvironment=" + this.useProxyPropertiesFromEnvironment);
 		log.debug("useProxyPropertiesFromFile=" + this.useProxyPropertiesFromFile);
 		log.debug("useProxyPropertiesFromSystem=" + this.useProxyPropertiesFromSystem);
-
+	
 		String httpProxyHostSystemProperty = System.getProperty("http.proxyHost");
 		String httpsProxyHostSystemProperty = System.getProperty("https.proxyHost");
 		String httpsProxyEnvVar = System.getenv("https_proxy");
-
+	
 		if (this.useProxyPropertiesFromFile && proxyHost != null) {
 			this.proxyHost = proxyHost;
 		} else if (this.useProxyPropertiesFromSystem && httpsProxyHostSystemProperty != null) {
@@ -211,9 +146,9 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 		} else
 			log.info(
 					"proxy host not set because the flags all state to ignore setting the proxy host or you did not provide the values in a property-file, as -D system properties, or set as an Environment Variable ");
-
+	
 		log.debug("proxyHost=" + this.proxyHost);
-
+	
 		if (this.oauthApplyProxyPropertiesToSystemProperties) {
 			// same as setting -Dhttps.proxyHost=myproxyserver.company.com
 			if (this.proxyHost != null) {
@@ -240,11 +175,11 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 	public void setProxyPort(String proxyPort) {
 		log.debug("http_proxy=" + System.getenv("https_proxy"));
 		log.debug("https.proxyPort=" + System.getProperty("https.proxyPort"));
-
+	
 		String httpProxyPortSystemProperty = System.getProperty("http.proxyPort");
 		String httpsProxyPortSystemProperty = System.getProperty("https.proxyPort");
 		String httpsProxyEnvVar = System.getenv("https_proxy");
-
+	
 		if (this.useProxyPropertiesFromFile && proxyPort != null) {
 			this.proxyPort = proxyPort;
 		} else if (this.useProxyPropertiesFromSystem && httpsProxyPortSystemProperty != null) {
@@ -259,9 +194,9 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 			this.proxyPort = httpsProxyPropPort;
 		} else
 			log.info("proxy port not set because the flags all state to ignore setting the proxy port");
-
+	
 		log.debug("proxyPort=" + this.proxyPort);
-
+	
 		if (this.oauthApplyProxyPropertiesToSystemProperties) {
 			// same as setting -Dhttps.proxyPort=8080
 			if (this.proxyPort != null) {
@@ -303,8 +238,82 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 	 * @return -
 	 */
 	@Override
+	public String getOauthIssuerId() {
+		return this.oauthIssuerId;
+	}
+
+	/**
+	 * you may override the setter with an @value annotated property
+	 * 
+	 * @param oauthIssuerId
+	 *            -
+	 */
+	public void setOauthIssuerId(String oauthIssuerId) {
+
+		this.oauthIssuerId = oauthIssuerId;
+	}
+
+	/**
+	 * @return -
+	 */
+	@Override
+	public String getOauthGrantType() {
+		return this.oauthGrantType;
+	}
+
+	/**
+	 * @param oauthGrantType
+	 *            -
+	 */
+	public void setGrantType(String oauthGrantType) {
+		this.oauthGrantType = oauthGrantType;
+
+	}
+
+	/**
+	 * @return -
+	 */
+	@Override
 	public String getOauthTokenType() {
 		return this.oauthTokenType;
+	}
+
+	/**
+	 * @return -
+	 */
+	@Override
+	public String getOauthClientId() {
+		if (this.oauthClientId != null)
+			return this.oauthClientId.trim();
+		return this.oauthClientId;
+	}
+
+	/**
+	 * you may override the setter with an @value annotated property
+	 * 
+	 * @param oauthClientId
+	 *            -
+	 */
+	public void setOauthClientId(String oauthClientId) {
+		this.oauthClientId = oauthClientId;
+	
+	}
+
+	/**
+	 * @return -
+	 */
+	@Override
+	public boolean getOauthClientIdEncode() {
+		return this.oauthClientIdEncode;
+	}
+
+	/**
+	 * @param oauthClientIdEncode
+	 *            -
+	 */
+	public void setOauthClientIdEncode(boolean oauthClientIdEncode) {
+		this.oauthClientIdEncode = oauthClientIdEncode;
+	
 	}
 
 	/**
@@ -316,11 +325,27 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 	}
 
 	/**
+	 * @param oauthUserName
+	 *            -
+	 */
+	public void setOauthUserName(String oauthUserName) {
+		this.oauthUserName = oauthUserName;
+	}
+
+	/**
 	 * @return the password
 	 */
 	@Override
 	public String getOauthUserPassword() {
 		return this.oauthUserPassword;
+	}
+
+	/**
+	 * @param oauthUserPassword
+	 *            -
+	 */
+	public void setOauthUserPassword(String oauthUserPassword) {
+		this.oauthUserPassword = oauthUserPassword;
 	}
 
 	/**
@@ -331,9 +356,29 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 		return this.oauthEncodeUserPassword;
 	}
 
+	/**
+	 * @param oauthEncodeUserPassword
+	 *            -
+	 */
+	public void setOauthEncodeUserPassword(boolean oauthEncodeUserPassword) {
+		this.oauthEncodeUserPassword = oauthEncodeUserPassword;
+	
+	}
+
+	/**
+	 * @return -
+	 */
 	@Override
-	public int getOauthSocketTimeout() {
-		return this.oauthSocketTimeout;
+	public String getOauthCertLocation() {
+		return this.oauthCertLocation;
+	}
+
+	/**
+	 * @return -
+	 */
+	@Override
+	public String getOauthCertPassword() {
+		return this.oauthCertPassword;
 	}
 
 	@Override
@@ -341,14 +386,9 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 		return this.oauthConnectionTimeout;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ge.predix.solsvc.restclient.IRestConfig#printName()
-	 */
 	@Override
-	public String printName() {
-		return "RestConfig"; //$NON-NLS-1$
+	public int getOauthSocketTimeout() {
+		return this.oauthSocketTimeout;
 	}
 
 	@Override
@@ -398,6 +438,16 @@ public class DefaultOauthRestConfig implements IOauthRestConfig, EnvironmentAwar
 	@Override
 	public int getDefaultSocketTimeout() {
 		return this.defaultSocketTimeout;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.ge.predix.solsvc.restclient.IRestConfig#printName()
+	 */
+	@Override
+	public String printName() {
+		return "RestConfig"; //$NON-NLS-1$
 	}
 
 	/*

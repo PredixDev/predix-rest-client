@@ -191,8 +191,14 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 	}
 
 	private void printPoolStats() {
-		log.trace("this.poolManager.getTotalStats().getMax()" + this.poolManager.getTotalStats().getMax()); //$NON-NLS-1$
-		log.trace("this.poolManager.getTotalStats().getLeased()" + this.poolManager.getTotalStats().getLeased()); //$NON-NLS-1$
+		int max = -1;
+		int leased = -1;
+		if ( this.poolManager != null) {
+			max = this.poolManager.getTotalStats().getMax();
+			leased = this.poolManager.getTotalStats().getLeased();
+		}
+		log.trace("this.poolManager.getTotalStats().getMax()=" + max); //$NON-NLS-1$
+		log.trace("this.poolManager.getTotalStats().getLeased()=" + leased); //$NON-NLS-1$
 
 	}
 

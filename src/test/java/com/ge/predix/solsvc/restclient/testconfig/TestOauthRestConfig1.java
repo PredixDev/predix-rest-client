@@ -12,7 +12,5 @@ import com.ge.predix.solsvc.restclient.config.IOauthRestConfig;
 @Component("testOauthRestConfig1")
 @SuppressWarnings({})
 public class TestOauthRestConfig1 extends DefaultOauthRestConfig implements IOauthRestConfig {
-
-	
-
+	//
 }

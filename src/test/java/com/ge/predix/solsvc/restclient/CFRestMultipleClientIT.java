@@ -1,14 +1,9 @@
 package com.ge.predix.solsvc.restclient;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.message.BasicHeader;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -18,10 +13,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.Assert;
 
 import com.ge.predix.solsvc.restclient.config.IOauthRestConfig;
 import com.ge.predix.solsvc.restclient.impl.RestClient;
-import org.springframework.util.Assert;
 
 /**
  * Use the PredixRestClient to make secure token calls to PredixAsset
@@ -39,7 +34,8 @@ import org.springframework.util.Assert;
 public class CFRestMultipleClientIT
 {
 
-    private static final Logger log = LoggerFactory.getLogger(CFRestMultipleClientIT.class);
+    @SuppressWarnings("unused")
+	private static final Logger log = LoggerFactory.getLogger(CFRestMultipleClientIT.class);
 
     @Autowired
     private RestClient          restClient;
