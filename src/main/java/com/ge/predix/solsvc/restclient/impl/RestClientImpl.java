@@ -35,6 +35,7 @@ import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.conn.params.ConnRoutePNames;
@@ -590,6 +591,43 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 			return httpResponse;
 		} catch (IOException e) {
 			throw new RuntimeException("unable to call url=" + url + " with headers=" + headers, e);
+		}
+	}
+
+	@Override
+	public CloseableHttpResponse patch(String url, String request, List<Header> headers) {
+		return patch(url, request, headers, this.restConfig.getDefaultConnectionTimeout(),
+				this.restConfig.getDefaultSocketTimeout());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * com.ge.predix.solsvc.restclient.impl.RestClient#post(java.lang.String,
+	 * java.lang.String, org.springframework.http.HttpHeaders)
+	 */
+	@SuppressWarnings({ "nls" })
+	@Override
+	public CloseableHttpResponse patch(String url, String request, List<Header> headers, int connectionTimeout,
+			int socketTimeout) {
+		try {
+			HttpPatch method = new HttpPatch(url);
+			org.apache.http.HttpEntity entity = new StringEntity(request);
+			method.setEntity(entity);
+			method.setHeaders(headers.toArray(new Header[headers.size()]));
+			try (CloseableHttpClient httpClient = getHttpClient(connectionTimeout, socketTimeout, url,
+					this.restConfig.getProxyHost(), this.restConfig.getProxyPort(),
+					this.restConfig.getNoProxyHost(), this.restConfig.getProxyUser(), this.restConfig.getProxyPassword());) {
+				CloseableHttpResponse httpResponse = httpClient.execute(method);
+				return httpResponse;
+			} catch (Exception e) {
+				throw new RuntimeException(
+						"unable to call url=" + url + " with headers=" + headers + " and body=" + request, e);
+			}
+		} catch (IOException e) {
+			throw new RuntimeException(
+					"unable to call url=" + url + " with headers=" + headers + " and body=" + request, e);
 		}
 	}
 

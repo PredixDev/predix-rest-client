@@ -76,7 +76,25 @@ public interface RestClient
      */
     public abstract CloseableHttpResponse put(String url, String request, List<Header> headers, int connectionTimeout, int socketTimeout);
 
-    /**
+  /**
+   * @param url -
+   * @param request -
+   * @param headers -
+   * @param connectionTimeout -
+   * @param socketTimeout -
+   * @return -
+   */
+  public abstract CloseableHttpResponse patch(String url, String request, List<Header> headers, int connectionTimeout, int socketTimeout );
+
+  /**
+   * @param url -
+   * @param request -
+   * @param headers -
+   * @return -
+   */
+  public CloseableHttpResponse patch(String url, String request, List<Header> headers);
+
+  /**
      * @param url -
      * @param headers -
      * @param connectionTimeout -
