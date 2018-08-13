@@ -103,6 +103,13 @@ public interface RestClient
      */
     public abstract CloseableHttpResponse delete(String url, List<Header> headers, int connectionTimeout, int socketTimeout);
 
+  /**
+   * @param url -
+   * @param headers -
+   * @return -
+   */
+    public abstract CloseableHttpResponse delete(String url, List<Header> headers);
+
     /**
      * @return -
      */

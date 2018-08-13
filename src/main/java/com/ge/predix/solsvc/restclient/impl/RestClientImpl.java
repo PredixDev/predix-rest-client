@@ -653,6 +653,12 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 			throw new RuntimeException("unable to call url=" + url + " with headers=" + headers, e);
 		}
 	}
+	@Override
+	public CloseableHttpResponse delete(String url, List<Header> headers) {
+		return delete(url, headers, this.restConfig.getDefaultConnectionTimeout(),
+				this.restConfig.getDefaultSocketTimeout());
+	}
+
 
 	/**
 	 * @param object
