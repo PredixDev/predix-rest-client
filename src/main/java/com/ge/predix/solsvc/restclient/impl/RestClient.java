@@ -65,7 +65,15 @@ public interface RestClient
      * @return -
      */
 	public CloseableHttpResponse post(String url, String request, List<Header> headers);
-	
+
+  /**
+   * @param url -
+   * @param request -
+   * @param headers -
+   * @return -
+   */
+  public CloseableHttpResponse post(String url, HttpEntity request, List<Header> headers);
+
     /**
      * @param url -
      * @param request -
@@ -76,7 +84,33 @@ public interface RestClient
      */
     public abstract CloseableHttpResponse put(String url, String request, List<Header> headers, int connectionTimeout, int socketTimeout);
 
-    /**
+  /**
+   * @param url -
+   * @param request -
+   * @param headers -
+   * @return -
+   */
+    public abstract CloseableHttpResponse put(String url, String request, List<Header> headers);
+
+  /**
+   * @param url -
+   * @param request -
+   * @param headers -
+   * @param connectionTimeout -
+   * @param socketTimeout -
+   * @return -
+   */
+  public abstract CloseableHttpResponse patch(String url, String request, List<Header> headers, int connectionTimeout, int socketTimeout );
+
+  /**
+   * @param url -
+   * @param request -
+   * @param headers -
+   * @return -
+   */
+  public CloseableHttpResponse patch(String url, String request, List<Header> headers);
+
+  /**
      * @param url -
      * @param headers -
      * @param connectionTimeout -
@@ -84,6 +118,13 @@ public interface RestClient
      * @return -
      */
     public abstract CloseableHttpResponse delete(String url, List<Header> headers, int connectionTimeout, int socketTimeout);
+
+  /**
+   * @param url -
+   * @param headers -
+   * @return -
+   */
+    public abstract CloseableHttpResponse delete(String url, List<Header> headers);
 
     /**
      * @return -
