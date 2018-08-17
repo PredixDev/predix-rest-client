@@ -534,6 +534,13 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 		}
 	}
 
+
+	@Override
+	public CloseableHttpResponse post(String url, HttpEntity entity, List<Header> headers) {
+		return post(url, entity, headers, this.restConfig.getDefaultConnectionTimeout(),
+				this.restConfig.getDefaultSocketTimeout());
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -568,6 +575,11 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 		}
 	}
 
+	@Override
+	public CloseableHttpResponse put(String url, String request, List<Header> headers) {
+		return put(url, request, headers, this.restConfig.getDefaultConnectionTimeout(),
+				this.restConfig.getDefaultSocketTimeout());
+	}
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -631,7 +643,8 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 		}
 	}
 
-	/*
+
+		/*
 	 * (non-Javadoc)
 	 * 
 	 * @see
@@ -653,6 +666,7 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 			throw new RuntimeException("unable to call url=" + url + " with headers=" + headers, e);
 		}
 	}
+
 	@Override
 	public CloseableHttpResponse delete(String url, List<Header> headers) {
 		return delete(url, headers, this.restConfig.getDefaultConnectionTimeout(),

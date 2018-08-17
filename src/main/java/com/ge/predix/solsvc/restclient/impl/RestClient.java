@@ -65,7 +65,15 @@ public interface RestClient
      * @return -
      */
 	public CloseableHttpResponse post(String url, String request, List<Header> headers);
-	
+
+  /**
+   * @param url -
+   * @param request -
+   * @param headers -
+   * @return -
+   */
+  public CloseableHttpResponse post(String url, HttpEntity request, List<Header> headers);
+
     /**
      * @param url -
      * @param request -
@@ -75,6 +83,14 @@ public interface RestClient
      * @return -
      */
     public abstract CloseableHttpResponse put(String url, String request, List<Header> headers, int connectionTimeout, int socketTimeout);
+
+  /**
+   * @param url -
+   * @param request -
+   * @param headers -
+   * @return -
+   */
+    public abstract CloseableHttpResponse put(String url, String request, List<Header> headers);
 
   /**
    * @param url -
