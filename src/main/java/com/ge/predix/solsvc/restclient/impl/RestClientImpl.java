@@ -515,7 +515,7 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 			int socketTimeout) {
 		try {
 			HttpPost method = new HttpPost(url);
-			org.apache.http.HttpEntity entity = new StringEntity(request);
+			org.apache.http.HttpEntity entity = new StringEntity(request, "utf-8");
 			method.setEntity(entity);
 			method.setHeaders(headers.toArray(new Header[headers.size()]));
 			try (CloseableHttpClient httpClient = getHttpClient(connectionTimeout, socketTimeout, url,
@@ -527,7 +527,7 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 				throw new RuntimeException(
 						"unable to call url=" + url + " with headers=" + headers + " and body=" + request, e);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(
 					"unable to call url=" + url + " with headers=" + headers + " and body=" + request, e);
 		}
@@ -583,7 +583,7 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 				this.restConfig.getProxyHost(), this.restConfig.getProxyPort(),
 				this.restConfig.getNoProxyHost(), this.restConfig.getProxyUser(), this.restConfig.getProxyPassword());) {
 			HttpPut method = new HttpPut(url);
-			org.apache.http.HttpEntity entity = new StringEntity(request);
+			org.apache.http.HttpEntity entity = new StringEntity(request, "utf-8");
 			method.setEntity(entity);
 			method.setHeaders(headers.toArray(new Header[headers.size()]));
 			CloseableHttpResponse httpResponse = httpClient.execute(method);
