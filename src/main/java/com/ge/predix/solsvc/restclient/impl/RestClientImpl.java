@@ -205,12 +205,12 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 	@Override
 	public List<Header> getSecureTokenForClientId() {
 		List<Header> headers = new ArrayList<Header>();
-		addSecureTokenForHeaders(headers);
+		addSecureTokenToHeaders(headers);
 		return headers;
 	}
 
 	@Override
-	public List<Header> addSecureTokenForHeaders(List<Header> headers) {
+	public List<Header> addSecureTokenToHeaders(List<Header> headers) {
 		String tokenResponse = requestToken(this.restConfig);
 		Token token = new Token(this.restConfig.getOauthTokenType());
 		token.update(tokenResponse);
@@ -444,7 +444,7 @@ public class RestClientImpl implements RestClient, ApplicationContextAware {
 
 	@SuppressWarnings("nls")
 	@Override
-	public List<Header> addZoneToHeaders(List<Header> headers, String value) {
+	public List<Header> addZoneIdToHeaders(List<Header> headers, String value) {
 		log.debug("add Predix-Zone-Id To Headers=" + value);
 		List<Header> localHeaders = headers;
 		if (localHeaders == null)

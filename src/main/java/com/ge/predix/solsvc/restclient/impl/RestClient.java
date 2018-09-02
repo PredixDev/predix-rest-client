@@ -101,14 +101,14 @@ public interface RestClient
      * @param headers -
      * @return -
      */
-    public List<Header> addSecureTokenForHeaders(List<Header> headers);
+    public List<Header> addSecureTokenToHeaders(List<Header> headers);
 
     /**
      * @param headers -
      * @param value -
      * @return -
      */
-    List<Header> addZoneToHeaders(List<Header> headers, String value);
+    List<Header> addZoneIdToHeaders(List<Header> headers, String value);
 
 
     /**
