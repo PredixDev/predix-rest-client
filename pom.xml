@@ -5,8 +5,8 @@
 
 	<groupId>com.ge.predix.solsvc</groupId>
 	<artifactId>predix-rest-client</artifactId>
-	<version>2.3.89</version>
-	<packaging>bundle</packaging>
+	<version>2.3.90</version>
+	<packaging>jar</packaging>
 
 	<properties>
 		<spring.version>4.1.6.RELEASE</spring.version>
