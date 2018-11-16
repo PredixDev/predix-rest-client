@@ -61,4 +61,4 @@ The predix-rest-client project provides standard GET, PUT, POST, DELETE with hel
 | Maven | https://artifactory.predix.io/artifactory/PREDIX-EXT |
 | CloudFoundry ClI 6.12.2 |  https://github.com/cloudfoundry/cli/tree/v6.12.2#downloads.  There is bug on this page, so you have to manually get the URL and the add "&version=6.12.2".  For example for Windows32 it would look like this...https://cli.run.pivotal.io/stable?release=windows32&source=github&version=6.12.2 |
 
-[![Analytics](https://ga-beacon.appspot.com/UA-82773213-1/predix-rest-client/readme?pixel)](https://github.com/PredixDev)
+[![Analytics](https://predix-beacon.appspot.com/UA-82773213-1/predix-rest-client/readme?pixel)](https://github.com/PredixDev)
